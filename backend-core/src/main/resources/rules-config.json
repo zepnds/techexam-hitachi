@@ -1,0 +1,70 @@
+{
+  "version": "1.0.0",
+  "description": "Complex Event Processing (CEP) Rules Configuration for Notification Delivery Platform",
+  "rules": [
+    {
+      "id": "RULE-DEDUP-001",
+      "name": "Message Deduplication Rule",
+      "description": "Suppress identical messages sent to the same user within a 5-minute sliding window",
+      "ruleType": "DEDUPLICATION",
+      "enabled": true,
+      "priority": 10,
+      "action": "DROP",
+      "windowSeconds": 300,
+      "targetChannel": null,
+      "conditions": {
+        "matchScope": "USER_AND_MESSAGE"
+      },
+      "reason": "Duplicate message suppressed within 5-minute deduplication window"
+    },
+    {
+      "id": "RULE-RATE-LIMIT-SMS-002",
+      "name": "SMS Channel Hourly Rate Limit",
+      "description": "Drop SMS messages if a user has already received 3 SMS notifications in the last 1 hour",
+      "ruleType": "RATE_LIMIT",
+      "enabled": true,
+      "priority": 20,
+      "action": "DROP",
+      "windowSeconds": 3600,
+      "maxAllowedEvents": 3,
+      "targetChannel": "SMS",
+      "conditions": {
+        "channel": "SMS"
+      },
+      "reason": "Exceeded rate limit of 3 SMS notifications within 1 hour"
+    },
+    {
+      "id": "RULE-QUIET-HOURS-PH-003",
+      "name": "Philippines Quiet Hours Routing",
+      "description": "Delay non-critical notifications for users in Philippines during quiet hours (10:00 PM to 06:00 AM) until 06:00 AM",
+      "ruleType": "QUIET_HOURS",
+      "enabled": true,
+      "priority": 30,
+      "action": "DELAY",
+      "targetCountry": "PHILIPPINES",
+      "targetChannel": null,
+      "conditions": {
+        "country": "PHILIPPINES",
+        "quietStartHour": 22,
+        "quietEndHour": 6,
+        "resumeHour": 6,
+        "resumeMinute": 0,
+        "timezone": "Asia/Manila"
+      },
+      "reason": "Delayed until morning (06:00 AM) due to regional quiet hours policy (10 PM - 6 AM)"
+    },
+    {
+      "id": "RULE-CONTENT-FILTER-004",
+      "name": "Security & Fraud Content Filter",
+      "description": "Filter or block messages containing forbidden spam/fraud terms",
+      "ruleType": "CONTENT_FILTER",
+      "enabled": true,
+      "priority": 40,
+      "action": "DROP",
+      "conditions": {
+        "blacklistedKeywords": ["FREE_CRYPTO_SCAM", "PHISHING_TEST_TOKEN"]
+      },
+      "reason": "Message contains prohibited keyword or fraudulent pattern"
+    }
+  ]
+}

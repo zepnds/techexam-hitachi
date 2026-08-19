@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  backend-gateway:
+    build:
+      context: .
+      dockerfile: backend-gateway/Dockerfile
+    container_name: notification-backend-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - BACKEND_CORE_URL=http://backend-core:8081
+    depends_on:
+      - backend-core
+    networks:
+      - notification-net
+    restart: unless-stopped
+
+  backend-core:
+    build:
+      context: .
+      dockerfile: backend-core/Dockerfile
+    container_name: notification-backend-core
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/notification_db
+      - SPRING_DATASOURCE_USERNAME=notification_user
+      - SPRING_DATASOURCE_PASSWORD=notification_pass
+      - NATS_SERVER_URL=nats://nats:4222
+    depends_on:
+      - postgres
+      - nats
+    networks:
+      - notification-net
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: notification-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=notification_db
+      - POSTGRES_USER=notification_user
+      - POSTGRES_PASSWORD=notification_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - notification-net
+
+  nats:
+    image: nats:2.10-alpine
+    container_name: notification-nats
+    command: ["-js", "-m", "8222"]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - nats_data:/data
+    networks:
+      - notification-net
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  nats_data:
+
+networks:
+  notification-net:
+    driver: bridge

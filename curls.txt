@@ -1,0 +1,124 @@
+DISTRIBUTED NOTIFICATION PLATFORM - API cURL COMMANDS LIST (IN ORDER)
+Base URL: http://localhost:8080 (Reactive Gateway Ingress)
+
+Send Email Notification (Standard Payload)
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "12345",
+    "country": "PHILIPPINES",
+    "channel": "EMAIL",
+    "message": "Your OTP code is 9876",
+    "recipient_target": "user@example.com"
+  }'
+
+
+Send SMS Notification
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "12345",
+    "country": "PHILIPPINES",
+    "channel": "SMS",
+    "message": "Your SMS validation code is 4321",
+    "recipient_target": "+639171234567"
+  }'
+
+
+Send Push Notification
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "67890",
+    "country": "UNITED_STATES",
+    "channel": "PUSH",
+    "message": "You have a new account update!",
+    "recipient_target": "device_token_abc123"
+  }'
+
+
+Send Slack Notification
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "99999",
+    "country": "SINGAPORE",
+    "channel": "SLACK",
+    "message": "System Deployment Alert: All Core Services Healthy",
+    "recipient_target": "#dev-alerts"
+  }'
+
+
+Send Scheduled Notification (Delayed UTC Timestamp)
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "12345",
+    "country": "PHILIPPINES",
+    "channel": "EMAIL",
+    "message": "Scheduled Reminder: Your appointment is set for tomorrow.",
+    "schedule_at": "2026-12-31T18:00:00Z"
+  }'
+
+
+Send Notification with Idempotency Key Header (Deduplication)
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: idemp-key-001" \
+  -d '{
+    "user_id": "12345",
+    "country": "PHILIPPINES",
+    "channel": "EMAIL",
+    "message": "Idempotent Transaction Receipt #1001",
+    "idempotency_key": "idemp-key-001"
+  }'
+
+
+Send Notification with Custom Correlation ID (Distributed Tracing)
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -H "X-Correlation-Id: trace-session-8842" \
+  -d '{
+    "user_id": "12345",
+    "country": "PHILIPPINES",
+    "channel": "SMS",
+    "message": "Correlated Order Update #5541"
+  }'
+
+
+Send Encrypted Notification (Base64 RSA Payload)
+curl -X POST "http://localhost:8080/notifications" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "12345",
+    "country": "PHILIPPINES",
+    "channel": "EMAIL",
+    "message": "Your OTP is 9876",
+    "encrypted_payload": "SGVsbG8gV29ybGQgLSAgRW5jcnlwdGVkIFBheWxvYWQ=",
+    "is_encrypted": true
+  }'
+
+
+Query Notification Status by ID (QUEUED, SENT, FAILED, RETRYING)
+curl -X GET "http://localhost:8080/notifications/<NOTIFICATION_ID>/status" \
+  -H "Accept: application/json"
+
+
+Query Full Notification Entity Details by ID
+curl -X GET "http://localhost:8080/notifications/<NOTIFICATION_ID>" \
+  -H "Accept: application/json"
+
+
+List Notifications by User ID
+curl -X GET "http://localhost:8080/notifications/user/12345" \
+  -H "Accept: application/json"
+
+
+Inspect Active CEP (Complex Event Processing) Rules
+curl -X GET "http://localhost:8080/notifications/rules" \
+  -H "Accept: application/json"
+
+
+Trigger Zero-Downtime CEP Rules Reload
+curl -X POST "http://localhost:8080/notifications/rules/reload" \
+  -H "Accept: application/json"

@@ -1,0 +1,26 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1
+    driverClassName: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+notification:
+  queue:
+    capacity: 1000
+    worker-threads: 4
+  retry:
+    max-attempts: 3
+    initial-interval-ms: 50
+    multiplier: 1.5
+    max-interval-ms: 500
+    jitter: false
+  gateways:
+    simulate-latency-ms: 10
+    failure-simulation:
+      enabled: false
